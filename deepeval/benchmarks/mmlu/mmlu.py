@@ -65,11 +65,10 @@ class MMLU(DeepEvalBaseBenchmark):
                 overall_total_predictions += len(goldens)
 
                 # Calculate task accuracy
+
                 if use_batch:
-                    for i in tqdm(
-                        range(0, len(goldens), batch_size),
-                        desc=f"Batch Processing {task.value} (batch_size={batch_size})",
-                    ):
+                    golden_tqdm = tqdm(range(0, len(goldens), batch_size), desc=f"Batch Processing {task.value} (batch_size={batch_size})")
+                    for i in golden_tqdm:
                         goldens_batch = goldens[i : i + batch_size]
                         batch_predictions = self.batch_predict(
                             model, task, goldens_batch
@@ -91,9 +90,12 @@ class MMLU(DeepEvalBaseBenchmark):
                                     score,
                                 )
                             )
+
+                            golden_tqdm.set_postfix(running_accuracy=f"{task_correct_predictions / (batch_size * (i + 1)):.2%}")
                 else:
+                    golden_tqdm = tqdm(goldens, desc=f"Processing {task.value}")
                     for idx, golden in enumerate(
-                        tqdm(goldens, desc=f"Processing {task.value}")
+                        golden_tqdm
                     ):
                         prediction, score = self.predict(
                             model, task, golden
@@ -119,6 +121,8 @@ class MMLU(DeepEvalBaseBenchmark):
                                 prediction,
                                 score,
                             )
+
+                        golden_tqdm.set_postfix(running_accuracy=f"{task_correct_predictions / (idx + 1):.2%}")
 
                 task_accuracy = (
                     task_correct_predictions / task_total_predictions
