@@ -91,7 +91,7 @@ class MMLU(DeepEvalBaseBenchmark):
                                 )
                             )
 
-                            golden_tqdm.set_postfix(running_accuracy=f"{task_correct_predictions / (batch_size * (i + 1)):.2%}")
+                        golden_tqdm.set_postfix(running_accuracy=f"{task_correct_predictions / (batch_size * (i + 1)):.2%}")
                 else:
                     golden_tqdm = tqdm(goldens, desc=f"Processing {task.value}")
                     for idx, golden in enumerate(
